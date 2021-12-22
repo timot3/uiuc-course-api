@@ -2,7 +2,7 @@ import flask
 import pandas as pd
 from flask import request, jsonify
 import sqlite3
-from SearchEngine import engine
+from utils.SearchEngine import engine
 from markdownify import markdownify
 
 fields_to_search = ["name", "label", "description"]
@@ -11,7 +11,7 @@ fields_to_search = ["name", "label", "description"]
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
-data_path = 'data/class_data.db'
+data_path = 'data/sp22_courses.db'
 
 
 def dict_factory(cursor, row):
@@ -21,9 +21,14 @@ def dict_factory(cursor, row):
     return d
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return "<h1>404</h1><p>The resource could not be found.</p>", 404
+
+
 @app.route('/', methods=['GET'])
 def home():
-    return "API is alive and well"
+    return "API is alive and well :)"
 
 
 @app.route('/api/classes/all', methods=['GET'])
@@ -31,42 +36,23 @@ def api_all():
     conn = sqlite3.connect(data_path)
     conn.row_factory = dict_factory
     cur = conn.cursor()
-    all_classes = cur.execute('SELECT * FROM classes;').fetchall()
+    all_classes = cur.execute('SELECT subject,number,name,credit_hours,label,description,gpa,degree_attributes,yearterm FROM classes;').fetchall()
 
     return jsonify(all_classes)
 
-
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return "<h1>404</h1><p>The resource could not be found.</p>", 404
-
       
-# @app.route('/api/classes/<string:name>/', methods=['GET'])
-# def api_get_subject(name):
-#     query = f"SELECT * FROM classes WHERE subject='{name.upper()}'"
-#     to_filter = []
-
-#     conn = sqlite3.connect(data_path)
-#     conn.row_factory = dict_factory
-#     cur = conn.cursor()
-#     results = cur.execute(query, to_filter).fetchall()
-
-#     return jsonify(results), 200
-
-
 @app.route('/api/classes/', methods=['GET'])
 def api_get_course():
     # class_id = f"{name.upper()} {str(number)}"
     # query = f"SELECT * FROM classes WHERE name='{class_id}'"
     to_filter = []
 
-    search_query = 'SELECT * FROM classes '
+    search_query = 'SELECT subject,number,name,credit_hours,label,description,gpa,degree_attributes,yearterm FROM classes '
     if 'subject' in request.args and 'number' in request.args:
-        search_query += f"WHERE subject='{request.args['subject']}' AND number='{request.args['number']}'"
+        search_query += f"WHERE subject='{request.args['subject'].upper()}' AND number='{request.args['number']}'"
     else:
         if 'subject' in request.args:
-            search_query += f"WHERE subject='{request.args['subject']}'"
+            search_query += f"WHERE subject='{request.args['subject'].upper()}'"
         elif 'number' in request.args:
             search_query += f"WHERE number='{request.args['number']}'"
         else:
