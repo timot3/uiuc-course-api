@@ -42,6 +42,7 @@ class SearchEngine:
             results = searcher.search(MultifieldParser(fields, schema=self.schema).parse(q))
             for r in results:
                 d = json.loads(r['raw'])
+                d['raw'] = json.loads(r['raw'])
                 if highlight:
                     for f in fields:
                         if r[f] and isinstance(r[f], str):
@@ -63,7 +64,7 @@ schema = Schema(
 )
 
 # load_classes_query = 'SELECT Subject,Number,Name,`Credit Hours`,Label,Description,GPA,`Degree Attributes`,YearTerm FROM classes '
-load_classes_query = 'SELECT subject,number,name,credit_hours,label,description,gpa FROM classes '
+load_classes_query = 'SELECT subject,number,name,credit_hours,label,description,gpa,yearterm FROM classes '
 
 docs = pd.DataFrame()
 with sqlite3.connect(data_path) as conn:
