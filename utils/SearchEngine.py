@@ -64,7 +64,7 @@ schema = Schema(
 )
 
 # load_classes_query = 'SELECT Subject,Number,Name,`Credit Hours`,Label,Description,GPA,`Degree Attributes`,YearTerm FROM classes '
-load_classes_query = 'SELECT subject,number,name,credit_hours,label,description,gpa,yearterm FROM classes '
+load_classes_query = 'SELECT subject,number,name,credit_hours,label,description,gpa,yearterm,degree_attributes FROM classes '
 
 docs = pd.DataFrame()
 with sqlite3.connect(data_path) as conn:

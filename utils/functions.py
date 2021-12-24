@@ -35,7 +35,7 @@ async def __cache_class(course: str, raw: dict, time_length=600) -> None:
 async def cache_classes(courses: dict):
     tasks = []
     for course in courses:
-        tasks.append(asyncio.create_task(__cache_class(course['label'], course['raw'])))
+        tasks.append(asyncio.create_task(__cache_class(course['label']['raw'], course['raw'])))
     await asyncio.wait(tasks)
         
 

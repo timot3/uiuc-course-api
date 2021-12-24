@@ -17,12 +17,12 @@ data_path = 'data/sp22_courses.db'
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return "<h1>404</h1><p>The resource could not be found.</p>", 404
+    return "The resource could not be found.", 404
 
 
 @app.route('/', methods=['GET'])
 def home():
-    return """API is alive and well :)
+    return """API is alive and well :) \n
     Visit https://github.com/timot3/uiuc-course-api for documentation."""
 
 
@@ -90,66 +90,5 @@ def api_search_course():
 
     return jsonify(descriptions_to_markdown(res)), 200
 
-
-
-# def get_class_from_course_explorer(course):
-#     href = ''
-#     try:
-#         href = urlopen('https://courses.illinois.edu/cisapp/explorer/catalog/2021/fall/' + course[0].upper() + '/'
-#                        + course[1] + '.xml')
-
-#     except urllib.error.HTTPError:
-#         return None
-
-#     class_tree = ET.parse(href).getroot()
-
-#     class_id = class_tree.attrib['id']  # AAS 100
-#     # department_code, course_num = course.__get_class(class_id)  # AAS, 100
-#     label = class_tree.find('label').text  # Intro Asian American Studies
-#     description = class_tree.find('description').text  # Provided description of the class
-#     crh = class_tree.find('creditHours').text  # 3 hours.
-#     deg_attr = ',\n'.join(
-#         x.text for x in class_tree.iter('genEdAttribute'))  # whatever geneds the class satisfies
-#     class_link = class_tree.find('termsOffered').find('course')
-#     most_recent_url = 'https://courses.illinois.edu/schedule/2021/fall/'
-#     if class_link is None:
-#         year_term = 'None'
-#     else:
-#         year_term = class_link.text
-#         most_recent_url = get_class_url(class_link.attrib['href'])
-#         if year_term == 'Spring 2022':
-#             year_term = 'Offered in ' + year_term + '. :white_check_mark:'
-#         else:
-#             year_term = 'Most recently offered in ' + year_term + '.'
-
-#     gpa = get_recent_average_gpa(class_id.upper().replace(' ', ''))
-#     #  return __get_dict(year_term, class_id, department_code, course_num, label, description, crh, deg_attr)
-
-#     online_status = get_online_status(most_recent_url)
-
-#     return Course(class_id, label, crh, gpa, year_term, deg_attr, description, most_recent_url, online_status)
-
-
-# def get_online_status(most_recent_url):
-#     try:
-#         # get total num of sections & num online
-#         r = requests.get(most_recent_url)
-#         soup = BeautifulSoup(r.content, 'html.parser')
-#         script = str(soup.find_all("script")[4])
-#         script = script.replace('\"', '')
-#         script = script.replace('\\a', 'A')
-#         # print(script)
-#         online_sections = script.count('type:<div class=App-meeting\>Online')
-#         total_sections = script.count("crn")
-#         # decide which emoji to use based on % of sections online
-
-#         status_emoji = ":computer:" if int(online_sections) / int(total_sections) >= 0.5 else ":books:"
-#         # create string/desc of status
-#         online_status = f"{online_sections} of {total_sections} sections online. {status_emoji}"
-#     except Exception:
-#         print(traceback.format_exc())
-#         online_status = "N/A"
-
-#     return online_status
 
 app.run()
