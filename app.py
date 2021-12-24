@@ -90,5 +90,5 @@ def api_search_course():
 
     return jsonify(descriptions_to_markdown(res)), 200
 
-
-app.run()
+if __name__ == '__main__':
+    app.run(threaded=True, port=5000)
