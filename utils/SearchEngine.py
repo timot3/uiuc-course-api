@@ -1,6 +1,6 @@
 from typing import Dict, List, Sequence
 
-from whoosh.index import create_in
+from whoosh.index import create_in, EmptyIndexError
 from whoosh.fields import *
 from whoosh.qparser import MultifieldParser
 from whoosh.filedb.filestore import RamStorage, FileStorage, copy_to_ram
@@ -11,8 +11,11 @@ import json
 # import pandas as pd
 import sys
 import sqlite3
+import pandas as pd
 
 data_path = 'data/sp22_courses.db'
+load_classes_query = 'SELECT subject,number,name,credit_hours,label,description,gpa,yearterm,degree_attributes FROM classes '
+
 # data_path = 'data/class_data.db'
 
 # code from https://github.com/darenr/python-whoosh-simple-example/blob/master/example.py
@@ -22,10 +25,20 @@ class SearchEngine:
         self.schema = schema
         schema.add('raw', TEXT(stored=True))
         # Load index from file storage
-        self.ix = copy_to_ram(FileStorage('data/index')).open_index()
+        # try loading index. IF unsuccessful, load index into Ram storage.
+        try:
+            storage = copy_to_ram(FileStorage('data/index'))
+            self.ix = storage.open_index()
 
-        self.docs = docs
-        self.index_documents(self.docs)
+        except EmptyIndexError:
+            docs = pd.DataFrame()
+            with sqlite3.connect(data_path) as conn:
+                # Use sql query to load docs into pandas dataframe.
+                docs = pd.read_sql(load_classes_query, conn).dropna().to_dict(orient='records')
+                self.index_documents(docs)
+
+        # self.docs = docs
+        # self.index_documents(self.docs)
 
     def index_documents(self, docs: Sequence):
         """
@@ -74,7 +87,6 @@ schema = Schema(
 )
 
 # load_classes_query = 'SELECT Subject,Number,Name,`Credit Hours`,Label,Description,GPA,`Degree Attributes`,YearTerm FROM classes '
-# load_classes_query = 'SELECT subject,number,name,credit_hours,label,description,gpa,yearterm,degree_attributes FROM classes '
 
 # docs = pd.DataFrame()
 # with sqlite3.connect(data_path) as conn:
