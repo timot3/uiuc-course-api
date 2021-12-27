@@ -1,5 +1,5 @@
 import flask
-import pandas as pd
+# import pandas as pd
 from flask import request, jsonify
 import sqlite3
 from utils.SearchEngine import engine
@@ -11,7 +11,7 @@ from utils.functions import course_cache, dict_factory, cache_classes, fields_to
 loop = asyncio.get_event_loop()
 
 app = flask.Flask(__name__)
-app.config["DEBUG"] = True
+# app.config["DEBUG"] = True
 
 data_path = 'data/sp22_courses.db'
 
@@ -90,5 +90,7 @@ def api_search_course():
 
     return jsonify(descriptions_to_markdown(res)), 200
 
-# if __name__ == '__main__':
-app.run(threaded=True)
+if __name__ == '__main__':
+# def main():
+    print("Starting app....")
+    app.run(host='0.0.0.0', debug=True)

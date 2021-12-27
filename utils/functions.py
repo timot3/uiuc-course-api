@@ -54,3 +54,4 @@ def descriptions_to_markdown(dict_res):
             itm[field] = markdownify(itm[field])
 
     return dict_res
+                             
