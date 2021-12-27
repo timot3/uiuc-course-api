@@ -1,6 +1,6 @@
 import flask
 # import pandas as pd
-from flask import request, jsonify
+from flask import request, jsonify, render_template
 import sqlite3
 from utils.SearchEngine import engine
 from functools import lru_cache
@@ -22,8 +22,7 @@ def page_not_found(e):
 
 @app.route('/', methods=['GET'])
 def home():
-    return """API is alive and well :) \n
-    Visit https://github.com/timot3/uiuc-course-api for documentation."""
+    return render_template('index.html')
 
 
 @app.route('/api/classes/all', methods=['GET'])
