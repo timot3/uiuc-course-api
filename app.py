@@ -13,7 +13,8 @@ loop = asyncio.get_event_loop()
 app = flask.Flask(__name__)
 # app.config["DEBUG"] = True
 
-data_path = 'data/sp22_courses.db'
+data_path = 'data/fa22_courses.db'
+
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -30,10 +31,12 @@ def api_all():
     conn = sqlite3.connect(data_path)
     conn.row_factory = dict_factory
     cur = conn.cursor()
-    all_classes = cur.execute('SELECT subject,number,name,credit_hours,label,description,gpa,degree_attributes,yearterm FROM classes;').fetchall()
+    all_classes = cur.execute(
+        'SELECT subject,number,name,credit_hours,label,description,gpa,degree_attributes,yearterm FROM classes;').fetchall()
     return jsonify(all_classes)
 
-@lru_cache  
+
+@lru_cache
 @app.route('/api/classes/', methods=['GET'])
 def api_get_course():
     # class_id = f"{name.upper()} {str(number)}"
@@ -49,7 +52,7 @@ def api_get_course():
         label = f'{subj.upper()} {num}'
         if label in course_cache:
             return course_cache[label], 200
-        
+
         search_query += f"WHERE subject='{subj.upper()}' AND number='{num}'"
         print(search_query)
     else:
@@ -59,7 +62,7 @@ def api_get_course():
             search_query += f"WHERE number='{num}'"
         else:
             return 'No query provided!', 404
-    
+
     print(search_query)
     conn = sqlite3.connect(data_path)
     conn.row_factory = dict_factory
@@ -73,23 +76,26 @@ def api_get_course():
 
     return jsonify(results), 200
 
-@app.route('/api/classes/search/', methods=['GET']) # GET api/classes/search/?query=Digital+Signal+Processing
+
+# GET api/classes/search/?query=Digital+Signal+Processing
+@app.route('/api/classes/search/', methods=['GET'])
 def api_search_course():
     search_query = ''
     if 'query' in request.args:
         search_query = request.args['query']
     else:
         return 'No query provided!', 404
-    
+
     res = engine.query(search_query, fields_to_search, highlight=True)
 
-    # I expect courses that were requested by a search to be requested 
+    # I expect courses that were requested by a search to be requested
     # immediately after with a query for more information
     loop.create_task(cache_classes(res))
 
     return jsonify(descriptions_to_markdown(res)), 200
 
+
 if __name__ == '__main__':
-# def main():
+    # def main():
     print("Starting app....")
     app.run(host='0.0.0.0', debug=True)
