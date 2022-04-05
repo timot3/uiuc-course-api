@@ -1,0 +1,1 @@
+Most of this data scraped from UIUC Course Explorer, using the CIS-scraper.js file in the parent directory.
