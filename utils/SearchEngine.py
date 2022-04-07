@@ -1,5 +1,5 @@
 from typing import Dict, List, Sequence
-
+from whoosh import index
 from whoosh.index import create_in, EmptyIndexError
 from whoosh.fields import *
 from whoosh.qparser import MultifieldParser
@@ -13,7 +13,7 @@ import sys
 import sqlite3
 import pandas as pd
 
-data_path = 'data/sp22_courses.db'
+data_path = 'data/fa22_courses.db'
 load_classes_query = 'SELECT subject,number,name,credit_hours,label,description,gpa,yearterm,degree_attributes FROM classes '
 
 # data_path = 'data/class_data.db'
@@ -36,6 +36,9 @@ class SearchEngine:
                 # Use sql query to load docs into pandas dataframe.
                 docs = pd.read_sql(load_classes_query, conn).dropna().to_dict(orient='records')
                 self.index_documents(docs)
+                
+                storage = copy_to_ram(FileStorage('data/index'))
+                self.ix = storage.open_index()
 
         # self.docs = docs
         # self.index_documents(self.docs)
@@ -48,8 +51,10 @@ class SearchEngine:
         # self.storage_ix = create_in(, schema=self.schema)
         if docs is None:
             return None
-            
+        
+        self.ix = index.create_in("data/index", self.schema)
         writer = self.ix.writer()
+
         for doc in docs:
             d = {k: v for k,v in doc.items() if k in self.schema.stored_names()}
             d['raw'] = json.dumps(doc) # raw version of all of doc
