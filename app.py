@@ -1,6 +1,7 @@
 import flask
 # import pandas as pd
 from flask import request, jsonify, render_template
+from flask_cors import CORS
 import sqlite3
 from utils.SearchEngine import engine
 from functools import lru_cache
@@ -10,7 +11,8 @@ from utils.functions import course_cache, dict_factory, cache_classes, fields_to
 
 loop = asyncio.get_event_loop()
 
-app = flask.Flask(__name__)
+app = flask.Flask(__name__) 
+CORS(app)
 # app.config["DEBUG"] = True
 
 data_path = 'data/fa22_courses.db'
