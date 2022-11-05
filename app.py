@@ -20,7 +20,6 @@ loop = asyncio.get_event_loop()
 
 app = flask.Flask(__name__)
 CORS(app)
-# app.config["DEBUG"] = True
 
 data_path = "data/sp23_courses.db"
 
