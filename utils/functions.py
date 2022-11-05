@@ -21,23 +21,25 @@ async def __cache_class(course: str, raw: dict, time_length=600) -> None:
 
     if course in course_cache:
         return
-    
+
     mutex.acquire()
     course_cache[course] = raw
     mutex.release()
 
     await asyncio.sleep(time_length)
-    
+
     mutex.acquire()
     course_cache[course].remove(course)
     mutex.release()
 
+
 async def cache_classes(courses: dict):
     tasks = []
     for course in courses:
-        tasks.append(asyncio.create_task(__cache_class(course['label']['raw'], course['raw'])))
+        tasks.append(
+            asyncio.create_task(__cache_class(course["label"]["raw"], course["raw"]))
+        )
     await asyncio.wait(tasks)
-        
 
 
 def dict_factory(cursor, row):
@@ -47,11 +49,9 @@ def dict_factory(cursor, row):
     return d
 
 
-
 def descriptions_to_markdown(dict_res):
     for itm in dict_res:
         for field in fields_to_search:
             itm[field] = markdownify(itm[field])
 
     return dict_res
-                             
