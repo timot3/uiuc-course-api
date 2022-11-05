@@ -1,3 +1,2 @@
-node CIS-scraper.js 2022-fa &
-node CIS-scraper.js 2022-sp &
+node CIS-scraper.js 2023-sp
 
