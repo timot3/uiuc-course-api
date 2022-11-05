@@ -13,7 +13,7 @@ import sys
 import sqlite3
 import pandas as pd
 
-data_path = "data/fa22_courses.db"
+data_path = "data/sp23_courses.db"
 index_path = "data/index/"
 load_classes_query = "SELECT subject,number,name,credit_hours,label,description,gpa,yearterm,degree_attributes FROM classes "
 
