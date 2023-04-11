@@ -21,7 +21,7 @@ loop = asyncio.get_event_loop()
 app = flask.Flask(__name__)
 CORS(app)
 
-data_path = "data/sp23_courses.db"
+data_path = "data/fa23_courses.db"
 
 
 @app.errorhandler(404)
