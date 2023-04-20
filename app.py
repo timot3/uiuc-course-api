@@ -1,3 +1,4 @@
+from typing import List, Tuple
 import flask
 
 # import pandas as pd
@@ -33,15 +34,15 @@ def page_not_found(e):
 def home():
     return render_template("index.html")
 
-
-def exec_query(search_query: str):
+@lru_cache
+def exec_query(search_query: str, to_filter: Tuple[str] = []):
     print(search_query)
     with sqlite3.connect(data_path) as conn:
         conn.row_factory = dict_factory
         cur = conn.cursor()
-        to_filter = []
 
-        results = cur.execute(search_query, to_filter).fetchall()
+        placeholders = tuple(to_filter)
+        results = cur.execute(search_query, placeholders).fetchall()
 
     if len(results) == 0:
         return "No courses found!", 404
@@ -55,33 +56,50 @@ def api_all():
     return exec_query(search_query)
 
 
-@lru_cache
 @app.route("/api/classes/", methods=["GET"])
 def api_get_course():
-    subj, num = None, None
+    subj, num, section = None, None, None
     if "subject" in request.args:
         subj = request.args["subject"]
     if "number" in request.args:
         num = request.args["number"]
+    if "section" in request.args:
+        section = request.args["section"]
 
     search_query = "SELECT * FROM classes "
+    to_filter = []
     if subj is not None and num is not None:
         # check to see if the course is cached or not
         label = f"{subj.upper()} {num}"
         if label in course_cache:
             return course_cache[label], 200
+        
+        to_filter.append(subj.upper())
+        to_filter.append(num)
 
-        search_query += f"WHERE subject='{subj.upper()}' AND number='{num}'"
+        if section is not None:
+            search_query += f"WHERE subject=? AND number=? AND section=?"
+            to_filter.append(section)
+        else:
+            search_query += f"WHERE subject=? AND number=?"
+        
         print(search_query)
     else:
         if subj is not None:
-            search_query += f"WHERE subject='{subj.upper()}'"
+            search_query += f"WHERE subject=?"
+            to_filter.append(subj.upper())
         elif num is not None:
-            search_query += f"WHERE number='{num}'"
+            search_query += f"WHERE number=?"
+            to_filter.append(num)
+        elif section is not None:
+            search_query += f"WHERE section=?"
+            to_filter.append(section)
         else:
             return "No query provided!", 404
 
-    return exec_query(search_query)
+    print(to_filter)
+    placeholder_tuple = tuple(to_filter)
+    return exec_query(search_query, to_filter=placeholder_tuple)
 
 
 @lru_cache

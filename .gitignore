@@ -1,4 +1,6 @@
 venv/
+# the name of my virtual environment
+courseapi/ 
 *.pyc
 staticfiles
 .env
