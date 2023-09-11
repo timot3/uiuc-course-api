@@ -1,7 +1,7 @@
 # uiuc-course-api
 REST API with course description searching. This api is designed specifically for the [UIUC Classes Bot on Discord](https://github.com/timot3/uiuc-classes-bot), but is live for anyone to use.
 
-Base URL: https://uiuc-course-api.herokuapp.com/
+This API used to run on heroku, but I took it down due to cost concerns. If you would like it back up for your projects, make an issue on this github repo and I'll be in touch!
 
 # Endpoints
 
